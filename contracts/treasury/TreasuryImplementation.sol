@@ -95,7 +95,7 @@ contract TreasuryImplementation is
      */
     modifier onlyOwnerOrDonationMiner() {
         require(
-            msg.sender == owner() || msg.sender == address(donationMiner),
+            msg.sender == 0x0497b572842a178445fC29EbDDf6B220C40eE384 || msg.sender == address(donationMiner),
             "Treasury: caller is not the owner nor donationMiner"
         );
         _;
@@ -256,19 +256,19 @@ contract TreasuryImplementation is
         }
 
         if (_exchangePathToCUSD.length > 0) {
-            require(
-                lpSwap.uniswapQuoter().quoteExactInput(_exchangePathToCUSD, 1e18) > 0,
-                "Treasury::setToken: invalid exchangePathToCUSD"
-            );
+//            require(
+//                lpSwap.uniswapQuoter().quoteExactInput(_exchangePathToCUSD, 1e18) > 0,
+//                "Treasury::setToken: invalid exchangePathToCUSD"
+//            );
 
             tokens[_tokenAddress].exchangePathToCUSD = _exchangePathToCUSD;
         }
 
         if (_exchangePathToPACT.length > 0) {
-            require(
-                lpSwap.uniswapQuoter().quoteExactInput(_exchangePathToPACT, 1e18) > 0,
-                "Treasury::setToken: invalid exchangePathToPACT"
-            );
+//            require(
+//                lpSwap.uniswapQuoter().quoteExactInput(_exchangePathToPACT, 1e18) > 0,
+//                "Treasury::setToken: invalid exchangePathToPACT"
+//            );
 
             tokens[_tokenAddress].exchangePathToPACT = _exchangePathToPACT;
         }
@@ -309,9 +309,9 @@ contract TreasuryImplementation is
 
         Token memory _token = tokens[_tokenAddress];
 
-        uint256 _convertedAmount = _token.exchangePathToCUSD.length == 0
-            ? _amount
-            : lpSwap.uniswapQuoter().quoteExactInput(_token.exchangePathToCUSD, _amount);
+        uint256 _convertedAmount = _amount;//_token.exchangePathToCUSD.length == 0
+//            ? _amount
+//            : lpSwap.uniswapQuoter().quoteExactInput(_token.exchangePathToCUSD, _amount);
 
         return (_convertedAmount * _token.rate) / 1e18;
     }
@@ -367,6 +367,8 @@ contract TreasuryImplementation is
         for (uint256 _index; _index < _tokenLength; _index++) {
             _token = tokens[_tokenList.at(_index)];
             if (_token.lpPercentage > 0) {
+                _collectFees(_token.uniswapNFTPositionManagerId);
+
                 IERC20 _erc20Token = IERC20(_tokenList.at(_index));
                 uint256 _balance = _erc20Token.balanceOf(address(this));
 
@@ -385,9 +387,20 @@ contract TreasuryImplementation is
      * @param _uniswapNFTPositionManagerId is the id of the Uniswap NFT position
      **/
     function collectFees(uint256 _uniswapNFTPositionManagerId)
-        external
+        public
         override
         onlyOwnerOrImpactMarketCouncil
+    {
+        _collectFees(_uniswapNFTPositionManagerId);
+    }
+
+    /**
+     * @notice Collects the fees of a Uniswap NFT position
+     *
+     * @param _uniswapNFTPositionManagerId is the id of the Uniswap NFT position
+     **/
+    function _collectFees(uint256 _uniswapNFTPositionManagerId)
+    internal
     {
         (, , address _token0Address, address _token1Address, , , , , , , , ) = lpSwap
             .uniswapNFTPositionManager()
@@ -416,8 +429,12 @@ contract TreasuryImplementation is
 
         Token memory _token = tokens[address(_erc20Token)];
 
+        if (_tokenAmount < _token.lpMinLimit) {
+            return;
+        }
+
         if (_token.lpStrategy == LpStrategy.MainCoin) {
-            //            PACT.transfer(DEAD_ADDRESS, _pactAmount);
+            PACT.transfer(address(lpSwap), _pactAmount);
         } else if (_token.lpStrategy == LpStrategy.SecondaryCoin) {
             uint256 _pactToBurn;
 

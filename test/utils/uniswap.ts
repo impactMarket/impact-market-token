@@ -12,13 +12,21 @@ const SwapRouterABI =
 const QuoterABI = require("../../util/abi/uniswap/periphery/Quoter.json").abi;
 
 export const uniswapRouterAddress =
-	"0x5615CDAb10dc425a742d643d949a7F474C01abc4";
+	"0xb24372480f6bcc574591eF26EE18dDBdf93cbc2d";
 export const uniswapQuoterAddress =
-	"0x82825d0554fA07f7FC52Ab63c961F330fdEFa8E8";
+	"0xb24372480f6bcc574591eF26EE18dDBdf93cbc2d";
 export const uniswapNFTPositionManagerAddress =
-	"0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A";
-export const uniswapExchangePathCUSDToPACT =
-	"0x765de816845861e75a25fca122bb6898b8b1282a00271046c9757c5497c5b1f2eb73ae79b6b67d119b0b58";
+	"0x52bc21329aDb4305d68B0d5265406AC5ABb25a02";
+
+
+// export const uniswapRouterAddress =
+// 	"0x5615CDAb10dc425a742d643d949a7F474C01abc4";
+// export const uniswapQuoterAddress =
+// 	"0x82825d0554fA07f7FC52Ab63c961F330fdEFa8E8";
+// export const uniswapNFTPositionManagerAddress =
+// 	"0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A";
+// export const uniswapExchangePathCUSDToPACT =
+// 	"0x765de816845861e75a25fca122bb6898b8b1282a00271046c9757c5497c5b1f2eb73ae79b6b67d119b0b58";
 
 export async function createPool(
 	creator: SignerWithAddress,

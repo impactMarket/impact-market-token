@@ -10,9 +10,9 @@ let deployer: SignerWithAddress;
 
 // mainnet
 const governanceDelegatorAddress = "0x8f8BB984e652Cb8D0aa7C9D6712Ec2020EB1BAb4";
-const target1Address = "0xFC641CE792c242EACcD545B7bee2028f187f61EC";
-const target2Address = "0x1C51657af2ceBA3D5492bA0c5A17E562F7ba6593";
-const newOwnerAddress = "0x0497b572842a178445fC29EbDDf6B220C40eE384";
+const newOwnerAddress = "0xc2A18BFFaD2cbA821279D09dC49D16497FfDEd64";
+
+const target1Address = "0x8f8BB984e652Cb8D0aa7C9D6712Ec2020EB1BAb4";
 
 
 // //alfajores
@@ -39,22 +39,18 @@ async function createUpgradeImplementation() {
 		deployer,
 		[
 			target1Address,
-			target2Address,
 		],
-		[0, 0],
+		[0],
 		[
-			"transferOwnership(address)",
 			"transferOwnership(address)",
 		],
 		[
 			["address"],
-			["address"]]
-		,
+		],
 		[
 			[newOwnerAddress],
-			[newOwnerAddress],
 		],
-		'Change contracts ownership'
+		'Change contract ownership'
 	);
 }
 

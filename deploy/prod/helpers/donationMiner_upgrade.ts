@@ -31,6 +31,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 	deployer = accounts[0];
 
 	await deployNewImplementation();
+	return;
 	await createUpgradeImplementation();
 };
 

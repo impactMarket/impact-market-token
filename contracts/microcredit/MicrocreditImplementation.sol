@@ -270,6 +270,20 @@ contract MicrocreditImplementation is
         return _loan.repayments[_repaymentId];
     }
 
+    /**
+     * @dev Pauses the contract
+     */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses the contract
+     */
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+
     function updateRevenueAddress(address _newRevenueAddress) external override onlyOwner {
         require(_newRevenueAddress != address(0), "Microcredit: revenueAddress must be set");
 
@@ -524,7 +538,7 @@ contract MicrocreditImplementation is
     function changeUserAddress(address _oldWalletAddress, address _newWalletAddress)
         external
         override
-        onlyManagers
+        onlyMaintainers
     {
         WalletMetadata storage _oldWalletMetadata = _walletMetadata[_oldWalletAddress];
         require(
@@ -548,7 +562,7 @@ contract MicrocreditImplementation is
      *
      * @param _loanId Loan ID
      */
-    function claimLoan(uint256 _loanId) external override nonReentrant {
+    function claimLoan(uint256 _loanId) external override nonReentrant whenNotPaused {
         _checkUserLoan(msg.sender, _loanId);
 
         WalletMetadata memory _metadata = _walletMetadata[msg.sender];
@@ -670,10 +684,10 @@ contract MicrocreditImplementation is
      * @param _borrowerAddresses address of the borrowers
      * @param _managerAddress address of the new manager
      */
-    function changeManager(address[] memory _borrowerAddresses, address _managerAddress)
+    function changeBorrowerManager(address[] memory _borrowerAddresses, address _managerAddress)
         external
         override
-        onlyManagers
+        onlyMaintainers
     {
         //todo: allocate loan to manager; not the user
         uint256 _index;
@@ -684,6 +698,13 @@ contract MicrocreditImplementation is
                 _walletList.contains(_borrowerAddresses[_index]),
                 "Microcredit: invalid borrower address"
             );
+
+            User storage _user = _users[_walletMetadata[_borrowerAddresses[_index]].userId];
+
+            if (_user.loans[_user.loansLength - 1].lastComputedDebt > 0) {
+                _user.loans[_user.loansLength - 1].managerAddress = _managerAddress;
+            }
+
             emit ManagerChanged(_borrowerAddresses[_index], _managerAddress);
         }
     }

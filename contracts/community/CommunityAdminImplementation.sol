@@ -11,6 +11,8 @@ import "./interfaces/CommunityAdminStorageV1.sol";
 import "../governor/impactMarketCouncil/interfaces/IImpactMarketCouncil.sol";
 import "./interfaces/CommunityAdminStorageV3.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @notice Welcome to CommunityAdmin, the main contract. This is an
  * administrative (for now) contract where the admins have control

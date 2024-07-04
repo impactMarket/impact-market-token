@@ -626,6 +626,8 @@ describe("Microcredit", () => {
           manager1LentAmountLimit,
         ]
       );
+
+      await Microcredit.connect(owner).addMaintainers([maintainer1.address, maintainer2.address])
     });
 
     it("Should not addLoan if not manager", async function () {
@@ -749,7 +751,7 @@ describe("Microcredit", () => {
         2000000000
       );
 
-      await Microcredit.connect(manager1).changeUserAddress(
+      await Microcredit.connect(maintainer1).changeUserAddress(
         user1.address,
         user2.address
       );
@@ -2115,7 +2117,7 @@ describe("Microcredit", () => {
         initialMicrocreditcUSDBalance.sub(amount).add(repaymentAmount1)
       );
 
-      await Microcredit.connect(manager1)
+      await Microcredit.connect(maintainer1)
         .changeUserAddress(user1.address, user2.address)
         .should.emit(Microcredit, "UserAddressChanged")
         .withArgs(user1.address, user2.address);
@@ -2216,7 +2218,7 @@ describe("Microcredit", () => {
     });
 
     it("should not changeUserAddress if not user", async function () {
-      await Microcredit.connect(manager1)
+      await Microcredit.connect(maintainer1)
         .changeUserAddress(user1.address, user2.address)
         .should.be.rejectedWith(
           "Microcredit: This user cannot be moved"
@@ -2238,11 +2240,11 @@ describe("Microcredit", () => {
         claimDeadline
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1).changeUserAddress(
+      await Microcredit.connect(maintainer1).changeUserAddress(
         user1.address,
         user2.address
       ).should.be.fulfilled;
-      await Microcredit.connect(manager1)
+      await Microcredit.connect(maintainer1)
         .changeUserAddress(user1.address, user2.address)
         .should.be.rejectedWith(
           "Microcredit: This user cannot be moved"
@@ -2272,17 +2274,17 @@ describe("Microcredit", () => {
         claimDeadline
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1)
+      await Microcredit.connect(maintainer1)
         .changeUserAddress(user1.address, user2.address)
         .should.be.rejectedWith(
           "Microcredit: Target wallet address is invalid"
         );
     });
 
-    it("should not changeUserAddress if not manager", async function () {
+    it("should not changeUserAddress if not maintainer", async function () {
       await Microcredit.connect(user1)
         .changeUserAddress(user1.address, user2.address)
-        .should.be.rejectedWith("Microcredit: caller is not a manager");
+        .should.be.rejectedWith("Microcredit: caller is not a maintainer");
     });
 
     it("should calculate currentDebt (interest=0)", async function () {
@@ -2481,7 +2483,7 @@ describe("Microcredit", () => {
       );
     });
 
-    it.only("should repayLoan after 1 day", async function () {
+    it("should repayLoan after 1 day", async function () {
       const amount = toEther(100);
       const period = sixMonth;
       const dailyInterest = toEther(0.2);
@@ -3659,7 +3661,7 @@ describe("Microcredit", () => {
       loan.tokenLastComputedDebt.should.eq(loan.lastComputedDebt);
       loan.tokenCurrentDebt.should.eq(loan.currentDebt);
 
-      await Microcredit.connect(manager1).changeUserAddress(
+      await Microcredit.connect(maintainer1).changeUserAddress(
         user1.address,
         user2.address
       ).should.be.fulfilled;
@@ -3709,7 +3711,7 @@ describe("Microcredit", () => {
         claimDeadline
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1).changeUserAddress(
+      await Microcredit.connect(maintainer1).changeUserAddress(
         user1.address,
         user2.address
       ).should.be.fulfilled;
@@ -4725,21 +4727,26 @@ describe("Microcredit", () => {
           manager1LentAmountLimit,
         ]
       );
+
+      await Microcredit.connect(owner)
+        .addMaintainers(
+          [maintainer1.address, maintainer2.address]
+        )
     });
 
-    it("Should not changeManager if not manager", async function () {
-      await Microcredit.connect(user2)
-        .changeManager([user1.address], manager1.address)
-        .should.be.rejectedWith("Microcredit: caller is not a manager");
-    });
-
-    it("Should not changeManager if new manager is not valid", async function () {
+    it("Should not changeBorrowerManager if not maintainer", async function () {
       await Microcredit.connect(manager1)
-        .changeManager([user1.address], user2.address)
+        .changeBorrowerManager([user1.address], maintainer1.address)
+        .should.be.rejectedWith("Microcredit: caller is not a maintainer");
+    });
+
+    it("Should not changeBorrowerManager if new manager is not valid", async function () {
+      await Microcredit.connect(maintainer1)
+        .changeBorrowerManager([user1.address], user2.address)
         .should.be.rejectedWith("Microcredit: invalid manager address");
     });
 
-    it("Should not changeManager if invalid borrower", async function () {
+    it("Should not changeBorrowerManager if invalid borrower", async function () {
       await Microcredit.connect(manager1).addLoan(
         user1.address,
         cUSD.address,
@@ -4749,14 +4756,14 @@ describe("Microcredit", () => {
         2000000000
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1)
-        .changeManager([user1.address, user2.address], manager1.address)
+      await Microcredit.connect(maintainer1)
+        .changeBorrowerManager([user1.address, user2.address], manager1.address)
         .should.be.rejectedWith(
           "Microcredit: invalid borrower address"
         );
     });
 
-    it("Should changeManager", async function () {
+    it("Should changeBorrowerManager", async function () {
       await Microcredit.connect(manager1).addLoan(
         user1.address,
         cUSD.address,
@@ -4766,13 +4773,13 @@ describe("Microcredit", () => {
         2000000000
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1)
-        .changeManager([user1.address], manager1.address)
+      await Microcredit.connect(maintainer1)
+        .changeBorrowerManager([user1.address], manager1.address)
         .should.emit(Microcredit, "ManagerChanged")
         .withArgs(user1.address, manager1.address);
     });
 
-    it("Should changeManager for multiple borrowers", async function () {
+    it("Should changeBorrowerManager for multiple borrowers", async function () {
       await Microcredit.connect(manager1).addLoan(
         user1.address,
         cUSD.address,
@@ -4791,8 +4798,8 @@ describe("Microcredit", () => {
         2000000000
       ).should.be.fulfilled;
 
-      await Microcredit.connect(manager1)
-        .changeManager([user1.address, user2.address], manager1.address)
+      await Microcredit.connect(maintainer1)
+        .changeBorrowerManager([user1.address, user2.address], manager1.address)
         .should.emit(Microcredit, "ManagerChanged")
         .withArgs(user1.address, manager1.address)
         .withArgs(user2.address, manager1.address);

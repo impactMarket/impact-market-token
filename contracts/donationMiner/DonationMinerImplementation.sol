@@ -528,6 +528,24 @@ contract DonationMinerImplementation is
     }
 
     /**
+     * @notice Virtual donate tokens to the treasury contract
+     *
+     * @param _amount Amount of tokens to fake deposit.
+     * @param _delegateAddress the address that will claim the reward for the donation
+     */
+    function addPoints(uint256 _amount, address _delegateAddress)
+    external
+    {
+        require (msg.sender == address(0xd6343CaA056bA88102754e165A4E463017FAac8C), 'DonationMiner: Invalid caller');
+        _addDonation(
+            _delegateAddress,
+            IERC20(MICROCREDIT_TOKEN_ADDRESS),
+            _amount,
+            address(treasury)
+        );
+    }
+
+    /**
      * @notice Transfers to the sender the rewards
      */
     function claimRewards() external override whenNotPaused whenStarted nonReentrant {

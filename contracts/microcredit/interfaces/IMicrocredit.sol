@@ -153,7 +153,7 @@ interface IMicrocredit {
     function changeUserAddress(address oldWalletAddress, address newWalletAddress) external;
     function claimLoan(uint256 loanId) external;
     function repayLoan(uint256 loanId, uint256 repaymentAmount) external;
-    function changeManager(address[] memory borrowerAddresses, address managerAddress) external;
+    function changeBorrowerManager(address[] memory borrowerAddresses, address managerAddress) external;
     function addToken(
         address tokenAddress,
         address[] calldata exchangeTokens,

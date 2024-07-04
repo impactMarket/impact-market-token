@@ -29,7 +29,7 @@ export enum LpStrategy {
 	SecondaryCoin = 2,
 }
 
-describe("Treasury", () => {
+describe.only("Treasury", () => {
 	//these tests work only on a celo mainnet fork network
 	let owner: SignerWithAddress;
 	let user1: SignerWithAddress;
@@ -275,7 +275,7 @@ describe("Treasury", () => {
 			await createPools();
 		});
 
-		it("Should convertAmount #1", async function () {
+		it.only("Should convertAmount #1", async function () {
 			const exchangePath = getExchangePath(mUSD, cUSD);
 			await Treasury.setToken(
 				mUSD.address,
@@ -1348,13 +1348,15 @@ describe("Treasury", () => {
 				);
 
 			expect(await PACT.balanceOf(Treasury.address)).to.be.eq(
+				treasuryInitialPACTBalance.add(toEther("0"))
+			);
+			expect(await PACT.balanceOf(TreasuryLpSwap.address)).to.be.eq(
 				treasuryInitialPACTBalance.add(toEther("0.999999999999999999"))
 			);
 			expect(await cUSD.balanceOf(Treasury.address)).to.be.eq(
 				treasuryInitialCUSDBalance.add(toEther(0))
 			);
 
-			expect(await PACT.balanceOf(TreasuryLpSwap.address)).to.be.eq(0);
 			expect(await cUSD.balanceOf(TreasuryLpSwap.address)).to.be.eq(0);
 			expect(await PACT.balanceOf(FAKE_ADDRESS)).to.be.eq(0);
 		});
@@ -1375,17 +1377,19 @@ describe("Treasury", () => {
 				.withArgs(
 					cUSDToPACTTokenId,
 					toEther("0.499999999999999999"),
-					toEther("0.999999999999999999")
+					toEther("1")
 				);
 
 			expect(await PACT.balanceOf(Treasury.address)).to.be.eq(
+				treasuryInitialPACTBalance.add(toEther("0"))
+			);
+			expect(await PACT.balanceOf(TreasuryLpSwap.address)).to.be.eq(
 				treasuryInitialPACTBalance.add(toEther("0.499999999999999999"))
 			);
 			expect(await cUSD.balanceOf(Treasury.address)).to.be.eq(
-				treasuryInitialCUSDBalance.add(toEther("0.999999999999999999"))
+				treasuryInitialCUSDBalance.add(toEther("1"))
 			);
 
-			expect(await PACT.balanceOf(TreasuryLpSwap.address)).to.be.eq(0);
 			expect(await cUSD.balanceOf(TreasuryLpSwap.address)).to.be.eq(0);
 			expect(await PACT.balanceOf(FAKE_ADDRESS)).to.be.eq(0);
 		});

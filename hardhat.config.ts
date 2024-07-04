@@ -33,9 +33,13 @@ export default {
       timeout: 100000,
       gasPrice: "auto",
       gas: 13000000,
+      // forking: {
+      //   chainId: 42220,
+      //   url: "https://forno.celo.org"
+      // },
       forking: {
-        chainId: 42220,
-        url: "https://forno.celo.org"
+        chainId: 84532,
+        url: "https://sepolia.base.org",
       },
     },
     alfajores: {
@@ -57,7 +61,12 @@ export default {
       gasPrice: "auto",
       gas: "auto",
       blockGasLimit: 13000000,
-    }
+    },
+    baseSepolia: {
+      url: 'https://sepolia.base.org',
+      accounts:
+        [getPrivateKey("mainnet")]
+    },
   },
   solidity: {
     compilers: [
